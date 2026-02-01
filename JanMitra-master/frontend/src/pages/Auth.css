@@ -1,0 +1,83 @@
+/* Auth.css - Premium Enhancements */
+
+/* Abstract Animated Background for Left Panel */
+.auth-bg-animation {
+    background: linear-gradient(-45deg, #0f172a, #1e293b, #0f172a, #27272a);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+}
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Glass Card Effect */
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow:
+        0 20px 50px -12px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(0, 0, 0, 0.02);
+}
+
+/* Floating Input Groups */
+.input-group {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.input-group input {
+    background: #f8fafc;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input-group input:focus {
+    background: #fff;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    transform: translateY(-2px);
+}
+
+.input-group:focus-within label {
+    color: var(--primary) !important;
+}
+
+/* Mode Switch Animation */
+.mode-switch-enter {
+    opacity: 0;
+    transform: translateX(50px);
+}
+
+.mode-switch-enter-active {
+    opacity: 1;
+    transform: translateX(0);
+    transition: all 500ms ease-out;
+}
+
+.mode-switch-exit {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.mode-switch-exit-active {
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: all 500ms ease-in;
+}
+
+@media (max-width: 900px) {
+    .auth-left-panel {
+        display: none !important;
+    }
+}

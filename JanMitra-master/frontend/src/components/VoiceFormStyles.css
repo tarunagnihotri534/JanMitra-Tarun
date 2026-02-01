@@ -1,0 +1,238 @@
+/* Voice Form Enhancement Styles */
+
+/* Pulse animation for continuous listening indicator */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+}
+
+/* Bounce animation for help button */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Slide in animation for UI elements */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Success checkmark animation */
+@keyframes checkmark {
+  0% {
+    transform: scale(0) rotate(45deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(45deg);
+  }
+  100% {
+    transform: scale(1) rotate(45deg);
+    opacity: 1;
+  }
+}
+
+/* Field glow effect */
+@keyframes fieldGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.2);
+  }
+}
+
+/* Success fill animation */
+@keyframes successFill {
+  0% {
+    border-color: #3b82f6;
+  }
+  50% {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  }
+  100% {
+    border-color: #10b981;
+  }
+}
+
+/* Interim text typing effect */
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* Voice input indicator styles */
+.voice-input-active {
+  animation: fieldGlow 2s ease-in-out infinite;
+}
+
+.voice-input-success {
+  animation: successFill 0.5s ease forwards;
+}
+
+.voice-checkmark {
+  animation: checkmark 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Continuous mode styles */
+.continuous-indicator {
+  animation: slideIn 0.3s ease;
+}
+
+.pulse-dot {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Interim transcript styles */
+.interim-transcript {
+  animation: fadeIn 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.interim-text {
+  display: inline-block;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* Form field states */
+.field-focused {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  transition: all 0.2s ease;
+}
+
+.field-voice-filled {
+  border-color: #10b981 !important;
+  animation: successFill 0.5s ease;
+}
+
+.field-interim {
+  border-color: #f59e0b !important;
+  background-color: #fffbeb !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .continuous-indicator {
+    min-width: 150px;
+    font-size: 0.85rem;
+  }
+  
+  .interim-transcript {
+    max-width: 180px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .field-focused {
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2) !important;
+  }
+  
+  .field-voice-filled {
+    box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.2);
+  }
+  
+  .interim-transcript {
+    background-color: rgba(59, 130, 246, 0.9);
+  }
+}
+
+/* Smooth transitions */
+input, textarea {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+/* Voice assistant button hover effects */
+button[title*="Continuous"],
+button[title*="निरंतर"] {
+  transition: all 0.3s ease;
+}
+
+button[title*="Continuous"]:hover,
+button[title*="निरंतर"]:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Loading/processing state */
+.processing-indicator {
+  position: relative;
+  overflow: hidden;
+}
+
+.processing-indicator::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    left: 100%;
+  }
+}
+
+/* Tooltip styles for voice commands */
+.voice-tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1001;
+  animation: fadeIn 0.2s ease;
+}
+
+.voice-tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid rgba(0, 0, 0, 0.9);
+}
