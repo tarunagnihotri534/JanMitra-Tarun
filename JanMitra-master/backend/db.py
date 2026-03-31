@@ -1,8 +1,11 @@
 import sqlite3
 import json
 import logging
+import threading
 from pathlib import Path
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 DB_FILE = "janmitra.db"
 JSON_FILE = "submissions.json"
@@ -85,6 +88,109 @@ def init_db(initial_schemes=None):
     # Seed schemes if provided
     if initial_schemes:
         seed_schemes(initial_schemes)
+
+    # Auto-build Hindi table in the background if it doesn't exist or is empty
+    _ensure_hindi_table(initial_schemes or [])
+
+def _ensure_hindi_table(schemes_data):
+    """Check if schemes_hi exists with data; if not, build it in background thread."""
+    conn = get_db_connection()
+    c = conn.cursor()
+    # Check if table exists and has rows
+    try:
+        c.execute("SELECT COUNT(*) FROM schemes_hi")
+        count = c.fetchone()[0]
+    except Exception:
+        count = 0
+    conn.close()
+
+    if count == 0 and schemes_data:
+        print("[JanMitra] Hindi table empty - building in background (first-time setup)...")
+        thread = threading.Thread(target=_build_hindi_table, args=(schemes_data,), daemon=True)
+        thread.start()
+    else:
+        print(f"[JanMitra] Hindi table ready ({count} schemes).")
+
+def _build_hindi_table(schemes_data):
+    """Translate all schemes to Hindi and store in schemes_hi table."""
+    try:
+        from deep_translator import GoogleTranslator
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+
+        def t(text):
+            if not text or not str(text).strip():
+                return text
+            try:
+                return GoogleTranslator(source='en', target='hi').translate(str(text))
+            except Exception:
+                return text
+
+        def t_list(lst):
+            return [t(item) for item in (lst or [])]
+
+        def t_details(details):
+            if not details:
+                return []
+            return [{"title": t(d.get("title", "")), "content": t(d.get("content", ""))} for d in details]
+
+        def translate_scheme(scheme):
+            print(f"[JanMitra] Translating: {scheme['name'][:40]}...")
+            return {
+                "id": scheme["id"],
+                "name": t(scheme["name"]),
+                "state": t(scheme.get("state", "")),
+                "city": t(scheme.get("city", "Any")),
+                "gender": t(scheme.get("gender", "Any")),
+                "age_group": scheme.get("age_group", "Any"),
+                "category": t(scheme.get("category", "Any")),
+                "description": t(scheme.get("description", "")),
+                "last_date": t(scheme.get("last_date", "31 December 2026")),
+                "required_docs": json.dumps(t_list(scheme.get("required_docs", []))),
+                "filling_steps": json.dumps(t_list(scheme.get("filling_steps", []))),
+                "benefits": json.dumps(t_list(scheme.get("benefits", []))),
+                "details": json.dumps(t_details(scheme.get("details", []))),
+            }
+
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute("DROP TABLE IF EXISTS schemes_hi")
+        c.execute("""
+            CREATE TABLE schemes_hi (
+                id INTEGER PRIMARY KEY,
+                name TEXT, state TEXT, city TEXT, gender TEXT,
+                age_group TEXT, category TEXT, description TEXT,
+                last_date TEXT, required_docs TEXT, filling_steps TEXT,
+                benefits TEXT, details TEXT
+            )
+        """)
+        conn.commit()
+        conn.close()
+
+        translated = []
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            futures = {executor.submit(translate_scheme, s): s for s in schemes_data}
+            for future in as_completed(futures):
+                try:
+                    translated.append(future.result())
+                except Exception as e:
+                    print(f"[JanMitra] Translation error: {e}")
+
+        translated.sort(key=lambda x: x["id"])
+        conn = get_db_connection()
+        c = conn.cursor()
+        for row in translated:
+            c.execute("""
+                INSERT INTO schemes_hi
+                (id, name, state, city, gender, age_group, category,
+                 description, last_date, required_docs, filling_steps, benefits, details)
+                VALUES (:id,:name,:state,:city,:gender,:age_group,:category,
+                        :description,:last_date,:required_docs,:filling_steps,:benefits,:details)
+            """, row)
+        conn.commit()
+        conn.close()
+        print(f"[JanMitra] Hindi table built successfully with {len(translated)} schemes!")
+    except Exception as e:
+        print(f"[JanMitra] Hindi table build failed: {e}")
 
 def seed_schemes(schemes_data):
     """Seed the database with initial schemes data, updating existing ones."""
