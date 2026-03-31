@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { FileText, Users, Landmark, Activity, CreditCard, ShieldCheck, ChevronRight, Loader2, Sparkles, ArrowRight, Mic, Zap, Globe, Lock, GraduationCap, X } from 'lucide-react';
+import { FileText, Users, Landmark, Activity, CreditCard, ShieldCheck, ChevronRight, Loader2, Sparkles, ArrowRight, Mic, Zap, Globe, Lock, GraduationCap, X, Scale } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import Sidebar from '../components/Sidebar';
@@ -45,7 +45,7 @@ const ServiceCard = ({ icon: Icon, title, desc, link, index }) => (
             </div>
             <div style={{ marginTop: 'auto', paddingTop: '1.5rem', display: 'flex', alignItems: 'center', fontSize: '0.95rem', fontWeight: 700, color: 'var(--secondary)' }}>
                 <span className="group-hover:translate-x-1 transition-transform" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    Apply Now <ChevronRight size={18} />
+                    {title} <ChevronRight size={18} />
                 </span>
             </div>
         </motion.div>
@@ -144,7 +144,7 @@ const SchemeDetailsModal = ({ scheme, onClose, t }) => {
                         ))}
                     </div>
                 ) : (
-                    <p>No detailed information available.</p>
+                    <p>{t?.dashboard?.noDetailInfo || "No detailed information available."}</p>
                 )}
                 <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
                     <Link to={`/forms/${scheme.id}`} className="btn btn-primary" onClick={onClose} style={{ borderRadius: '12px' }}>
@@ -211,8 +211,8 @@ export default function Dashboard() {
     }, [language]);
 
     useEffect(() => {
-        if (location.hash === '#youth-schemes') {
-            const elem = document.getElementById('youth-schemes');
+        if (location.hash === '#available-schemes' || location.hash === '#youth-schemes') {
+            const elem = document.getElementById('available-schemes') || document.getElementById('youth-schemes');
             if (elem) {
                 setTimeout(() => {
                     elem.scrollIntoView({ behavior: 'smooth' });
@@ -236,7 +236,7 @@ export default function Dashboard() {
         { title: t.dashboard.services.health.title, desc: t.dashboard.services.health.desc, icon: Activity, link: "/forms/health" },
         { title: t.dashboard.services.bills.title, desc: t.dashboard.services.bills.desc, icon: CreditCard, link: "/forms/bills" },
         { title: t.dashboard.services.grievance.title, desc: t.dashboard.services.grievance.desc, icon: ShieldCheck, link: "/forms/grievance" },
-        { title: t.dashboard.services.youth?.title || "Youth Schemes", desc: t.dashboard.services.youth?.desc || "Skill development & employment", icon: GraduationCap, link: "#youth-schemes" },
+        { title: t.dashboard?.services?.youth?.title || "Available Schemes", desc: t.dashboard?.services?.youth?.desc || "Explore and apply for schemes", icon: GraduationCap, link: "#available-schemes" },
     ];
 
     return (
@@ -284,7 +284,7 @@ export default function Dashboard() {
 
                         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                             <MagneticButton className="btn-primary" style={{ padding: '1.1rem 2.5rem', fontSize: '1.1rem', borderRadius: '50px' }}>
-                                Explore Services <ArrowRight size={20} />
+                                {t.dashboard.heroExplore || "Explore Services"} <ArrowRight size={20} />
                             </MagneticButton>
                         </div>
                     </div>
@@ -295,10 +295,10 @@ export default function Dashboard() {
                             display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem',
                             transform: 'rotate(-5deg)', padding: '2rem'
                         }}>
-                            <FeatureCard icon={Mic} title="Voice Enabled" color="#ef4444" delay={0.5} />
-                            <FeatureCard icon={Lock} title="Secure Data" color="#22c55e" delay={0.6} />
-                            <FeatureCard icon={Zap} title="Instant Apply" color="#eab308" delay={0.7} />
-                            <FeatureCard icon={Globe} title="Multi-Lingual" color="#3b82f6" delay={0.8} />
+                            <FeatureCard icon={Mic} title={t.dashboard.featureVoice || "Voice Enabled"} color="#ef4444" delay={0.5} />
+                            <FeatureCard icon={Lock} title={t.dashboard.featureSecure || "Secure Data"} color="#22c55e" delay={0.6} />
+                            <FeatureCard icon={Zap} title={t.dashboard.featureInstant || "Instant Apply"} color="#eab308" delay={0.7} />
+                            <FeatureCard icon={Globe} title={t.dashboard.featureMultiLingual || "Multi-Lingual"} color="#3b82f6" delay={0.8} />
                         </div>
                     </div>
                 </div>
@@ -307,15 +307,15 @@ export default function Dashboard() {
                 {isSearching && (
                     <div className="flex-center" style={{ padding: '3rem', color: 'var(--secondary)' }}>
                         <Loader2 className="animate-spin" size={40} />
-                        <span style={{ marginLeft: '12px', fontSize: '1.2rem', fontWeight: 500 }}>Finding best schemes for you...</span>
+                        <span style={{ marginLeft: '12px', fontSize: '1.2rem', fontWeight: 500 }}>{t.dashboard.searchingSchemes || "Finding best schemes for you..."}</span>
                     </div>
                 )}
 
                 {searchResults && !isSearching && (
                     <div className="results-section" style={{ marginBottom: '4rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                            <h2 style={{ fontSize: '2rem' }}>Search Results</h2>
-                            <button onClick={() => setSearchResults(null)} className="btn btn-secondary">Clear</button>
+                            <h2 style={{ fontSize: '2rem' }}>{t.dashboard.searchResultsTitle || "Search Results"}</h2>
+                            <button onClick={() => setSearchResults(null)} className="btn btn-secondary">{t.dashboard.searchClear || "Clear"}</button>
                         </div>
                         <div className="schemes-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
                             {searchResults.map((scheme) => (
@@ -330,6 +330,12 @@ export default function Dashboard() {
                                             <p style={{ color: 'var(--text-light)', margin: 0 }}>{scheme.description}</p>
                                             <SpeakerButton text={scheme.description} size={16} />
                                         </div>
+
+                                        {scheme.last_date && (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#dc2626', fontSize: '0.9rem', fontWeight: 600, marginBottom: '1rem', background: '#fef2f2', padding: '8px 12px', borderRadius: '12px', border: '1px solid #fee2e2' }}>
+                                                📅 {t.card?.lastDate || "Last Date:"} {scheme.last_date}
+                                            </div>
+                                        )}
 
                                         {/* Benefits Section */}
                                         {scheme.benefits && scheme.benefits.length > 0 && (
@@ -391,16 +397,59 @@ export default function Dashboard() {
                     </div>
                 )}
 
-                {/* Youth Scheme Section - New Addition */}
+                {/* ── Compare Schemes Promo Banner ─────────────────── */}
                 {!searchResults && (
-                    <div id="youth-schemes" className="youth-section" style={{ marginBottom: "4rem" }}>
+                    <Link to="/compare-schemes" style={{ textDecoration: 'none', display: 'block', marginBottom: '2.5rem' }}>
+                        <motion.div
+                            whileHover={{ scale: 1.015 }}
+                            style={{
+                                background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #0f2847 100%)',
+                                borderRadius: '28px',
+                                padding: '2.2rem 2.5rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                gap: '1.5rem',
+                                flexWrap: 'wrap',
+                                boxShadow: '0 20px 50px -10px rgba(15,23,42,0.35)',
+                                position: 'relative',
+                                overflow: 'hidden',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '220px', height: '220px', background: 'rgba(217,119,6,0.12)', borderRadius: '50%' }} />
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
+                                <div style={{ background: 'rgba(217,119,6,0.85)', borderRadius: '20px', width: '64px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 8px 20px rgba(217,119,6,0.4)' }}>
+                                    <Scale size={30} color="white" />
+                                </div>
+                                <div>
+                                    <div style={{ display: 'inline-block', background: 'rgba(217,119,6,0.85)', color: 'white', fontSize: '0.75rem', fontWeight: 700, padding: '3px 12px', borderRadius: '20px', marginBottom: '0.5rem', letterSpacing: '0.4px' }}>
+                                        {t.dashboard.compareBannerBadge || "✨ NEW FEATURE"}
+                                    </div>
+                                    <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'white', margin: 0, fontFamily: 'Inter, sans-serif', letterSpacing: '-0.5px' }}>
+                                        {t.dashboard.compareBannerTitle || "Compare Schemes"}
+                                    </h3>
+                                    <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.95rem', margin: '0.3rem 0 0', lineHeight: 1.5 }}>
+                                        {t.dashboard.compareBannerDesc || "Choose the best scheme for you — answer 3 quick questions and get personalised recommendations"}
+                                    </p>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(217,119,6,0.9)', color: 'white', padding: '0.9rem 1.8rem', borderRadius: '14px', fontWeight: 700, fontSize: '0.95rem', flexShrink: 0, boxShadow: '0 4px 16px rgba(217,119,6,0.4)', position: 'relative' }}>
+                                {t.dashboard.compareBannerBtn || "Find My Scheme"} <ArrowRight size={18} />
+                            </div>
+                        </motion.div>
+                    </Link>
+                )}
+
+                {!searchResults && (
+                    <div id="available-schemes" className="youth-section" style={{ marginBottom: "4rem" }}>
                         <div style={{ display: "flex", alignItems: "center", marginBottom: "2rem", gap: "12px" }}>
                             <div style={{ background: "#dbeafe", padding: "10px", borderRadius: "12px", color: "#2563eb" }}>
                                 <Sparkles size={24} />
                             </div>
                             <div>
-                                <h2 style={{ fontSize: "2rem", fontWeight: 700, margin: 0 }}>{t.youthSection?.title || "Youth Empowerment Schemes"}</h2>
-                                <p style={{ color: "var(--text-light)", fontSize: "1rem" }}>{t.youthSection?.subtitle || "Schemes dedicated to skill development and employment for youth."}</p>
+                                <h2 style={{ fontSize: "2rem", fontWeight: 700, margin: 0 }}>{t.youthSection?.title || "Available Schemes"}</h2>
+                                <p style={{ color: "var(--text-light)", fontSize: "1rem" }}>{t.youthSection?.subtitle || "Explore and apply for various government schemes."}</p>
                             </div>
                         </div>
 
@@ -426,6 +475,12 @@ export default function Dashboard() {
                                             <p style={{ color: 'var(--text-light)', margin: 0 }}>{scheme.description}</p>
                                             <SpeakerButton text={scheme.description} size={16} />
                                         </div>
+
+                                        {scheme.last_date && (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#dc2626', fontSize: '0.9rem', fontWeight: 600, marginBottom: '1rem', background: '#fef2f2', padding: '8px 12px', borderRadius: '12px', border: '1px solid #fee2e2' }}>
+                                                📅 {t.card?.lastDate || "Last Date:"} {scheme.last_date}
+                                            </div>
+                                        )}
 
                                         {/* Benefits Section */}
                                         {scheme.benefits && scheme.benefits.length > 0 && (
@@ -486,8 +541,8 @@ export default function Dashboard() {
                     <>
                         <div className="section-header" style={{ marginBottom: '3rem', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                             <div>
-                                <h2 className="section-title" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Available Services</h2>
-                                <p style={{ color: 'var(--text-light)', fontSize: '1.1rem' }}>Browse through our digital governance categories</p>
+                                <h2 className="section-title" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{t.dashboard.availableServices || "Available Services"}</h2>
+                                <p style={{ color: 'var(--text-light)', fontSize: '1.1rem' }}>{t.dashboard.availableServicesSubtitle || "Browse through our digital governance categories"}</p>
                             </div>
                         </div>
 

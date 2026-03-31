@@ -41,6 +41,7 @@ def init_db(initial_schemes=None):
             required_docs TEXT,
             filling_steps TEXT,
             benefits TEXT,
+            last_date TEXT,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             updated_at TEXT DEFAULT CURRENT_TIMESTAMP
         )
@@ -59,6 +60,13 @@ def init_db(initial_schemes=None):
     # Add benefits column if it doesn't exist
     try:
         c.execute("ALTER TABLE schemes ADD COLUMN benefits TEXT")
+    except sqlite3.OperationalError:
+        pass
+
+    try:
+        c.execute("ALTER TABLE schemes ADD COLUMN last_date TEXT")
+    except sqlite3.OperationalError:
+        pass
     except sqlite3.OperationalError:
         pass
 
@@ -88,8 +96,8 @@ def seed_schemes(schemes_data):
         # Use INSERT OR REPLACE to update existing schemes
         c.execute('''
             INSERT OR REPLACE INTO schemes 
-            (id, name, state, city, gender, age_group, category, description, required_docs, filling_steps, benefits, details, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            (id, name, state, city, gender, age_group, category, description, required_docs, filling_steps, benefits, details, last_date, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
         ''', (
             scheme['id'],
             scheme['name'],
@@ -102,7 +110,8 @@ def seed_schemes(schemes_data):
             json.dumps(scheme.get('required_docs', [])),
             json.dumps(scheme.get('filling_steps', [])),
             json.dumps(scheme.get('benefits', [])),
-            json.dumps(scheme.get('details', []))
+            json.dumps(scheme.get('details', [])),
+            scheme.get('last_date', '31 December 2026')
         ))
     conn.commit()
     print("Schemes update completed.")
@@ -161,12 +170,54 @@ def get_all_schemes(state=None, gender=None, age=None, category=None, updated_on
             "filling_steps": json.loads(row['filling_steps']),
             "benefits": json.loads(row['benefits']) if row['benefits'] else [],
             "details": json.loads(row['details']) if row.keys().__contains__('details') and row['details'] else [],
+            "last_date": row['last_date'] if 'last_date' in row.keys() else '31 December 2026',
             "created_at": row['created_at'],
             "updated_at": row['updated_at']
         })
     
     conn.close()
     return schemes
+
+def _row_to_dict_hi(row):
+    """Convert a schemes_hi db row to a dict."""
+    return {
+        "id": row['id'],
+        "name": row['name'],
+        "state": row['state'],
+        "city": row['city'],
+        "gender": row['gender'],
+        "age_group": row['age_group'],
+        "category": row['category'],
+        "description": row['description'],
+        "required_docs": json.loads(row['required_docs']) if row['required_docs'] else [],
+        "filling_steps": json.loads(row['filling_steps']) if row['filling_steps'] else [],
+        "benefits": json.loads(row['benefits']) if row['benefits'] else [],
+        "details": json.loads(row['details']) if row['details'] else [],
+        "last_date": row['last_date'] or '31 December 2026',
+    }
+
+def get_all_schemes_hi(en_ids):
+    """Retrieve pre-translated Hindi schemes for a given list of English scheme IDs."""
+    conn = get_db_connection()
+    c = conn.cursor()
+    placeholders = ','.join(['?' for _ in en_ids])
+    c.execute(f"SELECT * FROM schemes_hi WHERE id IN ({placeholders})", en_ids)
+    rows = c.fetchall()
+    conn.close()
+    # Preserve original order
+    id_map = {r['id']: _row_to_dict_hi(r) for r in rows}
+    return [id_map[i] for i in en_ids if i in id_map]
+
+def get_scheme_by_id_hi(scheme_id):
+    """Retrieve a single pre-translated Hindi scheme by ID."""
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('SELECT * FROM schemes_hi WHERE id = ?', (scheme_id,))
+    row = c.fetchone()
+    conn.close()
+    if row:
+        return _row_to_dict_hi(row)
+    return None
 
 def get_scheme_by_id(scheme_id):
     """Retrieve a single scheme by ID."""
@@ -190,6 +241,7 @@ def get_scheme_by_id(scheme_id):
             "filling_steps": json.loads(row['filling_steps']),
             "benefits": json.loads(row['benefits']) if row['benefits'] else [],
             "details": json.loads(row['details']) if row.keys().__contains__('details') and row['details'] else [],
+            "last_date": row['last_date'] if 'last_date' in row.keys() else '31 December 2026',
             "created_at": row['created_at'],
             "updated_at": row['updated_at']
         }

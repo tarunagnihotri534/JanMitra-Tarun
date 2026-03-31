@@ -1,10 +1,17 @@
 // Voice Form Processor - Smart field detection and form filling
 // Handles pattern matching, validation, and intelligent field detection
+// Enhanced with ML-based entity extraction
+
+import entityExtractor from './entityExtractor';
+import mlFieldMapper from './mlFieldMapper';
+import mlConfig from '../config/mlConfig';
 
 class VoiceFormProcessor {
   constructor() {
     this.focusedField = null;
     this.lastFilledField = null;
+    this.mlEnabled = mlConfig.modes.ml;
+    this.multiEntityEnabled = mlConfig.features.enableMultiField;
 
     // Field type patterns for validation
     this.fieldPatterns = {
@@ -92,6 +99,68 @@ class VoiceFormProcessor {
     this.focusedField = field;
   }
 
+  /**
+   * ML-Enhanced Processing (NEW)
+   * Uses entity extraction and intelligent field mapping
+   */
+  processTranscriptML(transcript, focusedField = null, formContext = {}, language = 'en') {
+    if (!transcript || transcript.trim().length === 0) {
+      return null;
+    }
+
+    const cleanTranscript = transcript.trim();
+
+    // Update focused field
+    if (focusedField) {
+      this.focusedField = focusedField;
+    }
+
+    // Auto-detect language if not specified
+    if (!language || language === 'auto') {
+      language = entityExtractor.detectLanguage(cleanTranscript);
+    }
+
+    console.log(`[ML Voice] Processing: "${cleanTranscript}" (${language})`);
+
+    // Extract entities and map to fields
+    const mappings = mlFieldMapper.mapToFields(
+      cleanTranscript,
+      language,
+      this.focusedField,
+      formContext
+    );
+
+    if (mappings.length === 0) {
+      console.log('[ML Voice] No entities detected, falling back to rule-based');
+      // Fallback to original rule-based processing
+      return this.processTranscript(cleanTranscript, focusedField, formContext);
+    }
+
+    console.log(`[ML Voice] Detected ${mappings.length} entity mappings:`, mappings);
+
+    // If multi-entity is enabled, return all mappings
+    if (this.multiEntityEnabled && mappings.length > 1) {
+      return {
+        multiField: true,
+        mappings: mappings.map(m => ({
+          field: m.field,
+          value: m.value,
+          confidence: m.confidence,
+          source: 'ml'
+        }))
+      };
+    }
+
+    // Single field - return the best mapping
+    const best = mappings[0];
+    return {
+      field: best.field,
+      value: best.value,
+      confidence: best.confidence,
+      source: 'ml'
+    };
+  }
+
   // Main processing function with enhanced contextualization
   processTranscript(transcript, focusedField = null, formContext = {}) {
     if (!transcript || transcript.trim().length === 0) {
@@ -128,16 +197,16 @@ class VoiceFormProcessor {
         if (value !== null && value !== undefined && value !== '') {
           // Semantic validation: Check if the value makes sense for the focused field
           const semanticScore = this.getSemanticScore(value, this.focusedField, formContext);
-          
+
           console.log(`[Voice] Field: ${this.focusedField}, Value: "${value}", Score: ${semanticScore.toFixed(2)}`);
-          
+
           // Accept if score is above 0.5 (more lenient)
           if (semanticScore >= 0.5) {
-            return { 
-              field: this.focusedField, 
-              value, 
+            return {
+              field: this.focusedField,
+              value,
               confidence: semanticScore >= 0.7 ? 'high' : 'medium',
-              semanticScore 
+              semanticScore
             };
           } else {
             console.warn(`[Voice] Rejected - Low score (${semanticScore.toFixed(2)}) for ${this.focusedField}: "${value}"`);
@@ -162,12 +231,12 @@ class VoiceFormProcessor {
       const inferred = this.inferFieldFromContent(cleanTranscript);
       if (inferred) {
         const semanticScore = this.getSemanticScore(inferred.value, inferred.field, formContext);
-        
+
         // Only accept high-confidence inferences
         if (semanticScore >= 0.8) {
-          return { 
-            ...inferred, 
-            confidence: 'medium', 
+          return {
+            ...inferred,
+            confidence: 'medium',
             semanticScore,
             source: 'inference'
           };
@@ -207,47 +276,47 @@ class VoiceFormProcessor {
   checkTypeCompatibility(value, field) {
     const fieldLower = field.toLowerCase();
     const valueClean = value.replace(/\s+/g, '').replace(/[-]/g, '');
-    
+
     // Numeric fields
     if (fieldLower.includes('age') || fieldLower.includes('umar')) {
       return /^\d{1,3}$/.test(valueClean) ? 1.0 : 0.0;
     }
-    
+
     if (fieldLower.includes('aadhar') || fieldLower.includes('aadhaar')) {
       return /^\d{12}$/.test(valueClean) ? 1.0 : 0.0;
     }
-    
+
     if (fieldLower.includes('phone') || fieldLower.includes('mobile')) {
       return /^\d{10}$/.test(valueClean) ? 1.0 : 0.0;
     }
-    
+
     if (fieldLower.includes('pin') || fieldLower.includes('postal')) {
       return /^\d{6}$/.test(valueClean) ? 1.0 : 0.0;
     }
-    
+
     if (fieldLower.includes('income') || fieldLower.includes('salary')) {
       return /^\d+$/.test(valueClean) ? 1.0 : 0.0;
     }
-    
+
     // Text fields
     if (fieldLower.includes('name') || fieldLower.includes('naam')) {
       return /^[a-zA-Z\s]+$/.test(value) ? 1.0 : 0.0;
     }
-    
+
     if (fieldLower.includes('email')) {
       return /@/.test(value) ? 1.0 : 0.0;
     }
-    
+
     if (fieldLower.includes('address') || fieldLower.includes('pata')) {
       return value.length > 5 ? 1.0 : 0.5;
     }
-    
+
     // For unknown/dynamic fields (like document fields), be lenient
     // If it has reasonable length and content, give it a good score
     if (value.length >= 2 && value.length <= 500) {
       return 0.8; // High neutral score for unknown fields
     }
-    
+
     return 0.6; // Still acceptable for very short values
   }
 
@@ -255,34 +324,34 @@ class VoiceFormProcessor {
   checkLengthAppropriate(value, field) {
     const fieldLower = field.toLowerCase();
     const len = value.length;
-    
+
     if (fieldLower.includes('name')) {
       return (len >= 2 && len <= 50) ? 1.0 : 0.2;
     }
-    
+
     if (fieldLower.includes('age')) {
       return (len >= 1 && len <= 3) ? 1.0 : 0.0;
     }
-    
+
     if (fieldLower.includes('aadhar')) {
       const digits = value.replace(/\D/g, '').length;
       return digits === 12 ? 1.0 : 0.0;
     }
-    
+
     if (fieldLower.includes('phone')) {
       const digits = value.replace(/\D/g, '').length;
       return digits === 10 ? 1.0 : 0.0;
     }
-    
+
     if (fieldLower.includes('address')) {
       return (len >= 5 && len <= 500) ? 1.0 : 0.5;
     }
-    
+
     // Be more lenient for unknown fields
     if (len >= 1 && len <= 500) {
       return 0.9;
     }
-    
+
     return 0.7; // Still okay for edge cases
   }
 
@@ -292,7 +361,7 @@ class VoiceFormProcessor {
     if (!formContext || !formContext.filledFields) {
       return 1.0;
     }
-    
+
     // Check if value is already filled (avoid duplicates)
     if (formContext.filledFields[field]) {
       const existing = formContext.filledFields[field];
@@ -300,13 +369,13 @@ class VoiceFormProcessor {
         return 0.8; // Allow re-filling same value (user might be correcting)
       }
     }
-    
+
     // Check if value is similar to other fields (potential misplacement)
     // But be more lenient - only penalize exact matches in critical fields
     const criticalFields = ['name', 'aadhar', 'phone'];
     const fieldLower = field.toLowerCase();
     const isCritical = criticalFields.some(cf => fieldLower.includes(cf));
-    
+
     if (isCritical) {
       for (const [otherField, otherValue] of Object.entries(formContext.filledFields)) {
         if (otherField !== field && otherValue === value) {
@@ -314,7 +383,7 @@ class VoiceFormProcessor {
         }
       }
     }
-    
+
     return 1.0; // Good contextual fit
   }
 
@@ -322,22 +391,22 @@ class VoiceFormProcessor {
   checkContentPatterns(value, field) {
     const fieldLower = field.toLowerCase();
     const valueLower = value.toLowerCase();
-    
+
     // Name fields should have name-like patterns
     if (fieldLower.includes('name')) {
       // Check for common name patterns
       const hasCapitals = /[A-Z]/.test(value);
       const noNumbers = !/\d/.test(value);
       const wordCount = value.split(/\s+/).length;
-      
+
       let score = 0.5;
       if (hasCapitals) score += 0.2;
       if (noNumbers) score += 0.2;
       if (wordCount >= 2 && wordCount <= 4) score += 0.1;
-      
+
       return score;
     }
-    
+
     // Age should be reasonable
     if (fieldLower.includes('age')) {
       const age = parseInt(value);
@@ -345,14 +414,14 @@ class VoiceFormProcessor {
       if (age > 0 && age <= 150) return 0.5;
       return 0.0;
     }
-    
+
     // Phone numbers often start with 6-9 in India
     if (fieldLower.includes('phone')) {
       const firstDigit = value.replace(/\D/g, '')[0];
       if (['6', '7', '8', '9'].includes(firstDigit)) return 1.0;
       return 0.6;
     }
-    
+
     return 0.7; // Neutral
   }
 

@@ -70,31 +70,30 @@ const Chatbot = () => {
         scrollToBottom();
     }, [messages, isOpen]);
 
-    const handleSend = () => {
+    const handleSend = async () => {
         if (!inputValue.trim()) return;
 
-        // Add user message
-        setMessages(prev => [...prev, { type: 'user', text: inputValue }]);
-
-        // Simulate bot response logic
-        setTimeout(() => {
-            let responseText = content.learning;
-
-            const lowerInput = inputValue.toLowerCase();
-            if (lowerInput.includes('safe') || lowerInput.includes('सुरक्षित')) {
-                responseText = content.responses.safe;
-            } else if (lowerInput.includes('scheme') || lowerInput.includes('information') || lowerInput.includes('योजना') || lowerInput.includes('जानकारी')) {
-                responseText = content.responses.scheme;
-            } else if (lowerInput.includes('date') || lowerInput.includes('last') || lowerInput.includes('तिथि') || lowerInput.includes('तारीख')) {
-                responseText = content.responses.dates;
-            } else if (lowerInput.includes('hello') || lowerInput.includes('hi') || lowerInput.includes('नमस्ते')) {
-                responseText = content.responses.hello;
-            }
-
-            setMessages(prev => [...prev, { type: 'bot', text: responseText }]);
-        }, 1000);
-
+        const userMsg = inputValue;
         setInputValue('');
+        setMessages(prev => [...prev, { type: 'user', text: userMsg }]);
+
+        // Send to backend
+        try {
+            const res = await fetch('http://127.0.0.1:8000/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: userMsg, language: currLang })
+            });
+            const data = await res.json();
+            
+            if (res.ok && data.reply) {
+                setMessages(prev => [...prev, { type: 'bot', text: data.reply }]);
+            } else {
+                setMessages(prev => [...prev, { type: 'bot', text: "Sorry, I encountered an error answering your question. " + (data.detail || "") }]);
+            }
+        } catch (error) {
+            setMessages(prev => [...prev, { type: 'bot', text: "Error connecting to AI Assistant." }]);
+        }
     };
 
     const handleKeyDown = (e) => {
@@ -103,14 +102,26 @@ const Chatbot = () => {
         }
     };
 
-    const handleChipClick = (key) => {
+    const handleChipClick = async (key) => {
         const text = content.chips[key];
         setMessages(prev => [...prev, { type: 'user', text: text }]);
 
-        setTimeout(() => {
-            const responseText = content.responses[key] || content.learning;
-            setMessages(prev => [...prev, { type: 'bot', text: responseText }]);
-        }, 800);
+        try {
+            const res = await fetch('http://127.0.0.1:8000/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text, language: currLang })
+            });
+            const data = await res.json();
+            
+            if (res.ok && data.reply) {
+                setMessages(prev => [...prev, { type: 'bot', text: data.reply }]);
+            } else {
+                setMessages(prev => [...prev, { type: 'bot', text: "Sorry, I encountered an error." }]);
+            }
+        } catch (error) {
+            setMessages(prev => [...prev, { type: 'bot', text: "Error connecting to AI Assistant." }]);
+        }
     };
 
     return (

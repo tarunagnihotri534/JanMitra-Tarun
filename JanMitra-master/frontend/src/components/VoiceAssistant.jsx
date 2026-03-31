@@ -130,17 +130,53 @@ export default function VoiceAssistant() {
     // Check for guide commands
     if (text.toLowerCase().includes('guide') || text.toLowerCase().includes('help')) {
       setGuideActive(true);
-      speak(guideSteps[0] || "No guide available.");
+      speak(guideSteps[0] || t.assistant?.noGuide || "No guide available.");
       return;
     }
 
-    // Delegate to form processor
-    const result = voiceFormProcessor.processTranscript(text, focusedField);
-    if (result?.field) {
+    // Use ML-enhanced processing
+    const result = voiceFormProcessor.processTranscriptML(
+      text,
+      focusedField,
+      {
+        availableFields: Object.keys(document.querySelectorAll('[name]') || {}).map(el => el.getAttribute?.('name')).filter(Boolean),
+        filledFields: {}
+      },
+      language
+    );
+
+    if (!result) {
+      console.log('[Voice] No result from ML processing');
+      return;
+    }
+
+    // Handle multi-field results
+    if (result.multiField && result.mappings) {
+      console.log(`[Voice] Multi-field update: ${result.mappings.length} fields`);
+      result.mappings.forEach(mapping => {
+        window.dispatchEvent(new CustomEvent('voiceInput', {
+          detail: {
+            field: mapping.field,
+            value: mapping.value,
+            isInterim: false,
+            confidence: mapping.confidence,
+            source: 'ml'
+          }
+        }));
+      });
+      speak(`${result.mappings.length} ${t.assistant?.updatedFields || "fields updated"}`);
+    } else if (result.field) {
+      // Single field update
       window.dispatchEvent(new CustomEvent('voiceInput', {
-        detail: { field: result.field, value: result.value, isInterim: false }
+        detail: {
+          field: result.field,
+          value: result.value,
+          isInterim: false,
+          confidence: result.confidence,
+          source: result.source || 'ml'
+        }
       }));
-      speak(`${result.field} updated`);
+      speak(`${result.field} ${t.assistant?.fieldUpdated || "updated"}`);
     }
   };
 
@@ -181,7 +217,7 @@ export default function VoiceAssistant() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
               <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
-                <Sparkles size={16} color="#fbbf24" /> AI Guide
+                <Sparkles size={16} color="#fbbf24" /> {t.assistant?.aiGuide || "AI Guide"}
               </h4>
               <button onClick={() => setGuideActive(false)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer' }}><X size={18} /></button>
             </div>
@@ -196,7 +232,7 @@ export default function VoiceAssistant() {
               }} className="btn-icon" style={{ background: 'rgba(255,255,255,0.1)' }}><ChevronLeft size={20} /></button>
 
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>
-                Step {currentStep + 1} / {guideSteps.length}
+                {t.assistant?.step || "Step"} {currentStep + 1} / {guideSteps.length}
               </div>
 
               <button onClick={() => {
@@ -251,12 +287,12 @@ export default function VoiceAssistant() {
               <div ref={indicatorRef} style={{ width: '48px', height: '48px', background: 'rgba(0,0,0,0.2)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Mic size={24} />
               </div>
-              <span style={{ fontWeight: 600 }}>Listening</span>
+              <span style={{ fontWeight: 600 }}>{t.assistant?.listening || "Listening"}</span>
             </>
           ) : (
             <>
               <Zap size={24} />
-              <span style={{ fontWeight: 600 }}>Start Voice AI</span>
+              <span style={{ fontWeight: 600 }}>{t.assistant?.startVoiceAI || "Start Voice AI"}</span>
             </>
           )}
         </motion.button>

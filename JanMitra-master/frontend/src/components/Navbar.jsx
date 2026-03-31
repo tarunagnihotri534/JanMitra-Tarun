@@ -35,6 +35,7 @@ export default function Navbar() {
         { title: t.nav.services, path: "/services" },
         { title: t.nav.forms, path: "/submit-form" },
         { title: t.nav.submissions, path: "/submissions" },
+        { title: t.nav.compareSchemes || "Compare Schemes", path: "/compare-schemes" },
     ];
 
     return (
@@ -137,16 +138,16 @@ export default function Navbar() {
 
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                             <Link to="/" onClick={() => setDropdownOpen(false)} className="dropdown-item">
-                                                <LayoutDashboard size={16} /> Dashboard
+                                                <LayoutDashboard size={16} /> {t.nav.dashboard || "Dashboard"}
                                             </Link>
                                             <Link to="/submissions" onClick={() => setDropdownOpen(false)} className="dropdown-item">
-                                                <FileText size={16} /> My Apps
+                                                <FileText size={16} /> {t.nav.myApps || "My Apps"}
                                             </Link>
                                         </div>
 
                                         <div style={{ marginTop: '0.5rem', borderTop: '1px solid #f1f5f9', paddingTop: '0.5rem' }}>
                                             <button onClick={logout} className="dropdown-item" style={{ width: '100%', color: '#ef4444' }}>
-                                                <LogOut size={16} /> Logout
+                                                <LogOut size={16} /> {t.nav.logout || "Logout"}
                                             </button>
                                         </div>
                                     </motion.div>

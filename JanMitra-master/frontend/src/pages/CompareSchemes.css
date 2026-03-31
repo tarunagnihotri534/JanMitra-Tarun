@@ -1,0 +1,861 @@
+/* ============================================================
+   CompareSchemes.css – Scheme Recommender Wizard Styles
+   ============================================================ */
+
+/* ── Page Shell ─────────────────────────────────────────────────── */
+.cs-page {
+    min-height: 100vh;
+    padding-bottom: 6rem;
+    background: linear-gradient(160deg, #f0f4ff 0%, #fafafa 50%, #f0fdf4 100%);
+}
+
+/* ── Hero ───────────────────────────────────────────────────────── */
+.cs-hero {
+    text-align: center;
+    padding: 4rem 2rem 3rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.cs-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+    border-radius: 30px;
+    padding: 8px 18px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.3px;
+}
+
+.cs-hero-title {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -1.5px;
+}
+
+.cs-highlight {
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.cs-hero-sub {
+    font-size: 1.1rem;
+    color: #64748b;
+    max-width: 540px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+
+/* ── Wizard Wrapper ─────────────────────────────────────────────── */
+.cs-wizard-wrap {
+    max-width: 820px;
+    margin: 0 auto 3rem;
+    padding: 0 1.5rem;
+}
+
+/* ── Step Progress Bar ──────────────────────────────────────────── */
+.cs-step-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 2.5rem;
+    position: relative;
+}
+
+.cs-step-bar::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: #e2e8f0;
+    transform: translateY(-50%);
+    z-index: 0;
+}
+
+.cs-step-progress {
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, #d97706, #f59e0b);
+    transform: translateY(-50%);
+    z-index: 1;
+    transition: width 0.5s ease;
+}
+
+.cs-step-dot {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 700;
+    background: white;
+    border: 2px solid #e2e8f0;
+    color: #64748b;
+    z-index: 2;
+    position: relative;
+    margin: 0 4rem;
+    transition: all 0.3s ease;
+}
+
+.cs-step-dot.active {
+    background: #d97706;
+    border-color: #d97706;
+    color: white;
+    box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.2);
+    transform: scale(1.15);
+}
+
+.cs-step-dot.done {
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
+}
+
+/* ── Wizard Step Card ───────────────────────────────────────────── */
+.cs-step {
+    background: white;
+    border-radius: 28px;
+    padding: 2.5rem;
+    box-shadow: 0 20px 60px -10px rgba(15, 23, 42, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.cs-step-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.cs-step-icon-svg {
+    color: #d97706;
+    flex-shrink: 0;
+    margin-top: 4px;
+}
+
+.cs-step-header h2 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin: 0 0 0.3rem;
+    color: #0f172a;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.5px;
+}
+
+.cs-step-header p {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* ── Age Cards ──────────────────────────────────────────────────── */
+.cs-age-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.cs-age-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.4rem 1rem;
+    border-radius: 20px;
+    border: 2px solid #e2e8f0;
+    background: #fafafa;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+}
+
+.cs-age-card strong {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+    display: block;
+}
+
+.cs-age-card small {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    line-height: 1.4;
+}
+
+.cs-age-card:hover {
+    border-color: var(--ag-color, #d97706);
+    background: white;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.1);
+}
+
+.cs-age-card.selected {
+    border-color: var(--ag-color, #d97706);
+    background: linear-gradient(135deg, white, #fffbeb);
+    box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.12), 0 8px 24px -4px rgba(0, 0, 0, 0.08);
+}
+
+.cs-age-emoji {
+    font-size: 2.2rem;
+    line-height: 1;
+}
+
+.cs-age-check {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #10b981;
+}
+
+/* ── Upload Card ────────────────────────────────────────────────── */
+.cs-upload-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
+}
+.cs-upload-card:hover[disabled] {
+    transform: none;
+    box-shadow: none;
+}
+
+/* ── State Picker ───────────────────────────────────────────────── */
+.cs-search-input {
+    width: 100%;
+    padding: 0.85rem 1.2rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    background: #f8fafc;
+    color: #1e293b;
+    transition: all 0.2s;
+    margin-bottom: 1.2rem;
+    outline: none;
+}
+
+.cs-search-input:focus {
+    border-color: #d97706;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+}
+
+.cs-state-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+    margin-bottom: 1.5rem;
+    scrollbar-width: thin;
+}
+
+.cs-state-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    border: 1.5px solid #e2e8f0;
+    background: white;
+    color: #475569;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.cs-state-pill:hover {
+    border-color: #d97706;
+    color: #d97706;
+    background: #fffbeb;
+}
+
+.cs-state-pill.selected {
+    background: #d97706;
+    border-color: #d97706;
+    color: white;
+    font-weight: 700;
+}
+
+/* ── Details Form ───────────────────────────────────────────────── */
+.cs-details-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.cs-field label {
+    display: block;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cs-options-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.6rem;
+    overflow-x: auto;
+}
+
+.cs-options-row.cs-wrap {
+    flex-wrap: wrap;
+}
+
+.cs-option-btn {
+    padding: 0.6rem 1.1rem;
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+    background: #f9fafb;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.cs-option-btn:hover {
+    border-color: #d97706;
+    background: #fffbeb;
+    color: #b45309;
+}
+
+.cs-option-btn.active {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+}
+
+/* ── Step Footer ────────────────────────────────────────────────── */
+.cs-step-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f1f5f9;
+}
+
+/* ── Buttons ────────────────────────────────────────────────────── */
+.cs-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.85rem 1.8rem;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.cs-btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.3);
+}
+
+.cs-btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.cs-btn-next { padding: 0.9rem 2rem; }
+
+.cs-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.75rem 1.2rem;
+    background: transparent;
+    color: #64748b;
+    border: 1.5px solid #d1d5db;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.cs-btn-ghost:hover {
+    border-color: #9ca3af;
+    color: #374151;
+    background: #f9fafb;
+}
+
+.cs-btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.7rem 1.4rem;
+    background: transparent;
+    color: #0f172a;
+    border: 2px solid #0f172a;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.cs-btn-outline:hover {
+    background: #0f172a;
+    color: white;
+}
+
+/* ── Loading ────────────────────────────────────────────────────── */
+.cs-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 5rem 2rem;
+    text-align: center;
+    color: #475569;
+    font-size: 1.05rem;
+}
+
+.cs-loading-spinner {
+    width: 56px;
+    height: 56px;
+    border: 4px solid #f1f5f9;
+    border-top-color: #d97706;
+    border-radius: 50%;
+    animation: cs-spin 0.9s linear infinite;
+}
+
+@keyframes cs-spin { to { transform: rotate(360deg); } }
+
+/* ── Results ────────────────────────────────────────────────────── */
+.cs-results-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.cs-summary-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    border-radius: 18px;
+    padding: 1.2rem 1.8rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f1f5f9;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.cs-summary-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.cs-trophy { color: #d97706; }
+
+.cs-summary-info strong {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2px;
+}
+
+.cs-summary-info span {
+    font-size: 0.85rem;
+    color: #64748b;
+    text-transform: capitalize;
+}
+
+.cs-restart { font-size: 0.85rem; }
+
+/* ── Top Pick Banner ────────────────────────────────────────────── */
+.cs-top-pick {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    border-radius: 24px;
+    padding: 2.5rem;
+    margin-bottom: 2.5rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.cs-top-pick::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 240px;
+    height: 240px;
+    background: rgba(217, 119, 6, 0.12);
+    border-radius: 50%;
+}
+
+.cs-top-pick-badge {
+    display: inline-block;
+    background: rgba(217, 119, 6, 0.85);
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    letter-spacing: 0.3px;
+}
+
+.cs-top-pick h2 {
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 800;
+    color: white;
+    margin-bottom: 0.75rem;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.5px;
+}
+
+.cs-top-pick p {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 640px;
+    margin-bottom: 1.5rem;
+}
+
+.cs-top-pick-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.cs-btn-outline-white {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.8rem 1.5rem;
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cs-btn-outline-white:hover { background: rgba(255,255,255,0.1); }
+
+.cs-btn-gold {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.8rem 1.8rem;
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 15px rgba(217, 119, 6, 0.4);
+}
+
+.cs-btn-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(217, 119, 6, 0.5);
+}
+
+/* ── Results Grid ───────────────────────────────────────────────── */
+.cs-results-sub {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.cs-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+/* ── Result Card ────────────────────────────────────────────────── */
+.cs-result-card {
+    background: white;
+    border-radius: 22px;
+    padding: 1.8rem;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.07);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+    cursor: default;
+}
+
+.cs-rank-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 0.2px;
+}
+
+.cs-result-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.cs-result-name {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #0f172a;
+    padding-right: 60px;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.35;
+}
+
+.cs-result-desc {
+    font-size: 0.88rem;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.cs-result-benefits {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    flex: 1;
+}
+
+.cs-benefits-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #166534;
+    margin-bottom: 0.5rem;
+}
+
+.cs-result-benefits ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    font-size: 0.83rem;
+    color: #15803d;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cs-result-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: auto;
+}
+
+.cs-result-actions .cs-btn-outline,
+.cs-result-actions .cs-btn-primary {
+    flex: 1;
+    justify-content: center;
+    font-size: 0.85rem;
+    padding: 0.65rem 0.8rem;
+    border-radius: 10px;
+}
+
+/* ── Modal ──────────────────────────────────────────────────────── */
+.cs-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(6px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.cs-modal-box {
+    background: white;
+    border-radius: 28px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 680px;
+    max-height: 88vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 30px 60px -10px rgba(0,0,0,0.3);
+}
+
+.cs-modal-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #374151;
+    transition: all 0.2s;
+}
+
+.cs-modal-close:hover { background: #e5e7eb; }
+
+.cs-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.cs-modal-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: #eff6ff;
+    color: #2563eb;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+
+.cs-modal-header h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0f172a;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.3;
+}
+
+.cs-modal-desc {
+    font-size: 0.98rem;
+    color: #4b5563;
+    line-height: 1.65;
+    margin-bottom: 1.5rem;
+}
+
+.cs-modal-section {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 14px;
+}
+
+.cs-modal-section h4 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.cs-modal-section ul {
+    padding-left: 1.3rem;
+    color: #374151;
+    font-size: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cs-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.cs-tag {
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    color: #4b5563;
+}
+
+.cs-modal-apply {
+    width: 100%;
+    justify-content: center;
+    border-radius: 14px;
+    padding: 1rem;
+    font-size: 1rem;
+    margin-top: 1rem;
+}
+
+/* ── No Results ─────────────────────────────────────────────────── */
+.cs-no-results {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #64748b;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .cs-step { padding: 1.5rem; }
+    .cs-age-grid { grid-template-columns: 1fr 1fr; }
+    .cs-results-grid { grid-template-columns: 1fr; }
+    .cs-top-pick { padding: 1.8rem 1.5rem; }
+    .cs-step-dot { margin: 0 2rem; }
+    .cs-options-row { flex-wrap: wrap; }
+    .cs-step-footer { flex-direction: column-reverse; width: 100%; }
+    .cs-btn-primary, .cs-btn-ghost { width: 100%; justify-content: center; }
+}

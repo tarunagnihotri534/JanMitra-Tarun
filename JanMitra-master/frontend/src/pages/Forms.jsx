@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import GrievanceForm from './GrievanceForm';
 import { useLanguage } from '../context/LanguageContext';
 import axios from 'axios';
 import { Check, ArrowLeft, Mic, Send, FileText, Info, Loader2, AlignLeft, CreditCard, Activity } from 'lucide-react';
@@ -69,7 +70,7 @@ export default function Forms() {
     // Voice Event Listeners
     useEffect(() => {
         const handleVoiceInput = (e) => {
-            const { field, value, isInterim, action } = e.detail;
+            const { field, value, isInterim, action, confidence, source } = e.detail;
             setIsListening(true);
 
             // Auto-hide listening state after inactivity
@@ -95,6 +96,11 @@ export default function Forms() {
                         setVoiceFilledFields(prev => [...prev, field]);
                         setTimeout(() => setVoiceFilledFields(prev => prev.filter(f => f !== field)), 2000);
                     }
+
+                    // Log ML confidence if available
+                    if (source === 'ml' && confidence) {
+                        console.log(`[Forms] ML filled ${field} with confidence ${(confidence * 100).toFixed(0)}%`);
+                    }
                 }
             }
         };
@@ -103,8 +109,95 @@ export default function Forms() {
         return () => window.removeEventListener('voiceInput', handleVoiceInput);
     }, [voiceFilledFields]);
 
+    // Field Definitions & Validation Logic
+    const getFieldProps = (name) => {
+        const lowerName = name.toLowerCase();
+
+        if (lowerName.includes('aadhar')) {
+            return {
+                maxLength: 14, // 12 digits + 2 spaces/dashes
+                placeholder: 'XXXX-XXXX-XXXX',
+                pattern: "\\d{4}-\\d{4}-\\d{4}",
+                title: "12-digit Aadhaar number"
+            };
+        }
+        if (lowerName.includes('pan')) {
+            return {
+                maxLength: 10,
+                placeholder: 'ABCDE1234F',
+                pattern: "[A-Z]{5}[0-9]{4}[A-Z]{1}",
+                title: "10-character PAN number"
+            };
+        }
+        if (lowerName.includes('voter')) {
+            return {
+                maxLength: 10,
+                placeholder: 'ABC1234567',
+                style: { textTransform: 'uppercase' }
+            };
+        }
+        if (lowerName.includes('phone') || lowerName.includes('mobile')) {
+            return {
+                maxLength: 10,
+                placeholder: '9876543210',
+                pattern: "[0-9]{10}",
+                type: 'tel'
+            };
+        }
+        if (lowerName.includes('pincode') || lowerName.includes('pin')) {
+            return {
+                maxLength: 6,
+                placeholder: '110001',
+                pattern: "[0-9]{6}"
+            };
+        }
+        if (lowerName.includes('income')) {
+            return {
+                type: 'number',
+                min: 0
+            };
+        }
+        return {};
+    };
+
+    const formatValue = (name, value) => {
+        const lowerName = name.toLowerCase();
+
+        // Aadhaar: 1234-5678-9012
+        if (lowerName.includes('aadhar')) {
+            const clean = value.replace(/\D/g, '');
+            const limited = clean.slice(0, 12);
+            let formatted = limited;
+            if (limited.length > 4) formatted = limited.slice(0, 4) + '-' + limited.slice(4);
+            if (limited.length > 8) formatted = formatted.slice(0, 9) + '-' + limited.slice(8);
+            return formatted;
+        }
+
+        // PAN / Voter ID / IFSC: Uppercase
+        if (lowerName.includes('pan') || lowerName.includes('voter') || lowerName.includes('ifsc')) {
+            return value.toUpperCase().slice(0, 10); // PAN/Voter are usually max 10
+        }
+
+        // Phone / Pincode: Digits only
+        if (lowerName.includes('phone') || lowerName.includes('mobile')) {
+            return value.replace(/\D/g, '').slice(0, 10);
+        }
+        if (lowerName.includes('pincode') || lowerName.includes('pin')) {
+            return value.replace(/\D/g, '').slice(0, 6);
+        }
+
+        // Name: Validate characters (allow letters, spaces, dots)
+        if (lowerName === 'name' || lowerName.includes('full name')) {
+            return value.replace(/[^a-zA-Z\s.]/g, '');
+        }
+
+        return value;
+    };
+
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        const formattedValue = formatValue(name, value);
+        setFormData({ ...formData, [name]: formattedValue });
     };
 
     const handleFocus = (field) => {
@@ -137,7 +230,7 @@ export default function Forms() {
     const formFields = [
         { name: 'name', type: 'text', label: t.forms.fullName, icon: '👤' },
         { name: 'age', type: 'number', label: t.forms.age, icon: '🎂' },
-        { name: 'aadhar', type: 'text', label: t.forms.aadhar, icon: '🆔', placeholder: 'XXXX-XXXX-XXXX' },
+        { name: 'aadhar', type: 'text', label: t.forms.aadhar, icon: '🆔' },
         { name: 'address', type: 'textarea', label: t.forms.address, icon: '📍' }
     ];
 
@@ -150,6 +243,10 @@ export default function Forms() {
         });
     } else if (!isScheme && type === 'income') {
         formFields.push({ name: 'income', type: 'number', label: t.forms.annualIncome, icon: '💰' });
+    }
+
+    if (!isScheme && type === 'grievance') {
+        return <GrievanceForm />;
     }
 
     return (
@@ -277,7 +374,7 @@ export default function Forms() {
                                             value={formData[field.name] || ''}
                                             onChange={handleChange}
                                             onFocus={() => handleFocus(field.name)}
-                                            placeholder={field.placeholder || ''}
+                                            {...getFieldProps(field.name)}
                                             className={`form-input premium-input ${voiceFilledFields.includes(field.name) ? 'voice-pulse' : ''}`}
                                             required
                                         />

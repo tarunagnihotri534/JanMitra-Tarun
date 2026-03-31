@@ -19,36 +19,36 @@ export default function Services() {
         )
             .fromTo(gridRef.current.children,
                 { y: 40, opacity: 0 },
-                { y: 0, opacity: 1, stagger: 0.05, duration: 0.8 },
-                "-=0.4"
+                { y: 0, opacity: 1, stagger: 0.05, duration: 0.8 }
             );
     }, []);
 
     const categories = [
         {
-            title: "Citizen Services",
+            title: t.servicesPage?.categories?.citizenServices || "Citizen Services",
             filter: "citizen",
             items: [
-                { title: "Income Certificate", desc: "Apply for income verification documents", icon: FileText, link: "/forms/income", color: "blue" },
-                { title: "Caste Certificate", desc: "SC/ST/OBC certification application", icon: Users, link: "/forms/caste", color: "purple" },
-                { title: "Pension Scheme", desc: "Old age and widow pension benefits", icon: Landmark, link: "/forms/pension", color: "amber" },
-                { title: "Health Card", desc: "Ayushman Bharat & State Health Cards", icon: Activity, link: "/forms/health", color: "emerald" },
+                { title: t.servicesPage?.items?.incomeTitle || "Income Certificate", desc: t.servicesPage?.items?.incomeDesc || "Apply for income verification documents", icon: FileText, link: "/forms/income", color: "blue" },
+                { title: t.servicesPage?.items?.casteTitle || "Caste Certificate", desc: t.servicesPage?.items?.casteDesc || "SC/ST/OBC certification application", icon: Users, link: "/forms/caste", color: "purple" },
+                { title: t.servicesPage?.items?.pensionTitle || "Pension Scheme", desc: t.servicesPage?.items?.pensionDesc || "Old age and widow pension benefits", icon: Landmark, link: "/forms/pension", color: "amber" },
+                { title: t.servicesPage?.items?.healthTitle || "Health Card", desc: t.servicesPage?.items?.healthDesc || "Ayushman Bharat & State Health Cards", icon: Activity, link: "/forms/health", color: "emerald" },
             ]
         },
         {
-            title: "Utility & Payments",
+            title: t.servicesPage?.categories?.utilityPayments || "Utility & Payments",
             filter: "utility",
             items: [
-                { title: "Bill Payments", desc: "Electricity, Water, and Gas bills", icon: CreditCard, link: "/forms/bills", color: "cyan" },
-                { title: "Grievance Redressal", desc: "Report issues to local authorities", icon: ShieldCheck, link: "/forms/grievance", color: "rose" },
+                { title: t.servicesPage?.items?.billsTitle || "Bill Payments", desc: t.servicesPage?.items?.billsDesc || "Electricity, Water, and Gas bills", icon: CreditCard, link: "/forms/bills", color: "cyan" },
+                { title: t.servicesPage?.items?.grievanceTitle || "Grievance Redressal", desc: t.servicesPage?.items?.grievanceDesc || "Report issues to local authorities", icon: ShieldCheck, link: "/forms/grievance", color: "rose" },
             ]
         },
         {
-            title: "Document Services",
+            title: t.servicesPage?.categories?.documentServices || "Document Services",
             filter: "docs",
             items: [
-                { title: "Document Locker", desc: "Securely store your official documents", icon: UploadCloud, link: "/locker", color: "indigo" },
-                { title: "Digital Signature", desc: "e-Sign documents via Aadhar", icon: FileSignature, link: "/esign", color: "orange" },
+                { title: t.servicesPage?.items?.lockerTitle || "Document Locker", desc: t.servicesPage?.items?.lockerDesc || "Securely store your official documents", icon: UploadCloud, link: "/locker", color: "indigo" },
+                { title: t.servicesPage?.items?.esignTitle || "Digital Signature", desc: t.servicesPage?.items?.esignDesc || "e-Sign documents via Aadhar", icon: FileSignature, link: "/esign", color: "orange" },
+                { title: "Smart Form Analyzer", desc: "Detect hidden risks and fraud in legal documents", icon: Search, link: "/form-reader", color: "red" }
             ]
         }
     ];
@@ -65,7 +65,7 @@ export default function Services() {
                         marginBottom: '1rem',
                         fontFamily: 'var(--font-heading)'
                     }}>
-                        {t.navbar.services || "Our Services"}
+                        {t.nav?.services || "Our Services"}
                     </h1>
                     <p style={{
                         fontSize: '1.25rem',
@@ -73,7 +73,7 @@ export default function Services() {
                         maxWidth: '600px',
                         margin: '0 auto'
                     }}>
-                        Access all government services, schemes, and digital tools in one place.
+                        {t.servicesPage?.subtitle || "Access all government services, schemes, and digital tools in one place."}
                     </p>
                 </div>
 
@@ -108,7 +108,7 @@ export default function Services() {
                                                 display: 'flex',
                                                 flexDirection: 'column',
                                                 background: 'white',
-                                                border: '1px solid rgba(0,0,0,0.05)',
+                                                border: '1px solid rgba(3, 3, 3, 0.05)',
                                                 transition: 'all 0.3s ease'
                                             }}
                                         >
@@ -142,7 +142,7 @@ export default function Services() {
                                                 fontSize: '0.9rem',
                                                 gap: '0.5rem'
                                             }}>
-                                                Access Now <ChevronRight size={16} />
+                                                {t.servicesPage?.accessNow || "Access Now"} <ChevronRight size={16} />
                                             </div>
                                         </motion.div>
                                     </Link>

@@ -10,6 +10,8 @@ import Submissions from "./pages/Submissions";
 import Auth from "./pages/Auth";
 import Services from "./pages/Services";
 import FormOptions from "./pages/FormOptions";
+import CompareSchemes from "./pages/CompareSchemes";
+import FormReader from "./pages/FormReader";
 
 import VoiceAssistant from "./components/VoiceAssistant";
 import Chatbot from "./components/Chatbot";
@@ -33,6 +35,8 @@ function AnimatedRoutes() {
         <Route path="/forms/:type" element={<PageTransition><Forms /></PageTransition>} />
         <Route path="/submit-form" element={<PageTransition><FormOptions /></PageTransition>} />
         <Route path="/submissions" element={<PageTransition><Submissions /></PageTransition>} />
+        <Route path="/compare-schemes" element={<PageTransition><CompareSchemes /></PageTransition>} />
+        <Route path="/form-reader" element={<PageTransition><FormReader /></PageTransition>} />
         {/* Fallback route */}
         <Route path="*" element={<PageTransition><Dashboard /></PageTransition>} />
       </Routes>
