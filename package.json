@@ -1,0 +1,6 @@
+{
+  "name": "janmitra-deployment",
+  "scripts": {
+    "vercel-build": "cd JanMitra-master/frontend && npm install && npm run build"
+  }
+}
