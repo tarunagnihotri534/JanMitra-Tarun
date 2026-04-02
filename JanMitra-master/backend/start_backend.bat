@@ -6,3 +6,5 @@ call .venv\Scripts\activate
 pip install fastapi uvicorn pydantic deep-translator
 uvicorn main:app --reload --host 127.0.0.1 --port 8000
 pause
+//http://127.0.0.1:8000/submissions
+//uvicorn main:app --reload --host 127.0.0.1 --port 8000

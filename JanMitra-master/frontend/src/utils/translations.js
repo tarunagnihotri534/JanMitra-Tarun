@@ -343,7 +343,9 @@ export const translations = {
                 lockerTitle: "Document Locker",
                 lockerDesc: "Securely store your official documents",
                 esignTitle: "Digital Signature",
-                esignDesc: "e-Sign documents via Aadhar"
+                esignDesc: "e-Sign documents via Aadhar",
+                smartFormTitle: "Smart Form Analyzer",
+                smartFormDesc: "Detect hidden risks and fraud in legal documents"
             },
             accessNow: "Access Now"
         },
@@ -718,7 +720,9 @@ export const translations = {
                 lockerTitle: "दस्तावेज़ लॉकर",
                 lockerDesc: "अपने आधिकारिक दस्तावेज़ सुरक्षित रूप से रखें",
                 esignTitle: "डिजिटल हस्ताक्षर",
-                esignDesc: "आधार के माध्यम से दस्तावेज़ों पर ई-हस्ताक्षर करें"
+                esignDesc: "आधार के माध्यम से दस्तावेज़ों पर ई-हस्ताक्षर करें",
+                smartFormTitle: "स्मार्ट फॉर्म विश्लेषक",
+                smartFormDesc: "कानूनी दस्तावेज़ों में छिपे जोखिम और धोखाधड़ी का पता लगाएं"
             },
             accessNow: "अभी पहुंचें"
         },

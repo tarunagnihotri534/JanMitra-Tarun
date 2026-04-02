@@ -85,7 +85,7 @@ const Chatbot = () => {
                 body: JSON.stringify({ message: userMsg, language: currLang })
             });
             const data = await res.json();
-            
+
             if (res.ok && data.reply) {
                 setMessages(prev => [...prev, { type: 'bot', text: data.reply }]);
             } else {
@@ -113,7 +113,7 @@ const Chatbot = () => {
                 body: JSON.stringify({ message: text, language: currLang })
             });
             const data = await res.json();
-            
+
             if (res.ok && data.reply) {
                 setMessages(prev => [...prev, { type: 'bot', text: data.reply }]);
             } else {

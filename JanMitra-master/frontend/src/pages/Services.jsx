@@ -48,7 +48,7 @@ export default function Services() {
             items: [
                 { title: t.servicesPage?.items?.lockerTitle || "Document Locker", desc: t.servicesPage?.items?.lockerDesc || "Securely store your official documents", icon: UploadCloud, link: "/locker", color: "indigo" },
                 { title: t.servicesPage?.items?.esignTitle || "Digital Signature", desc: t.servicesPage?.items?.esignDesc || "e-Sign documents via Aadhar", icon: FileSignature, link: "/esign", color: "orange" },
-                { title: "Smart Form Analyzer", desc: "Detect hidden risks and fraud in legal documents", icon: Search, link: "/form-reader", color: "red" }
+                { title: t.servicesPage?.items?.smartFormTitle || "Smart Form Analyzer", desc: t.servicesPage?.items?.smartFormDesc || "Detect hidden risks and fraud in legal documents", icon: Search, link: "/form-reader", color: "red" }
             ]
         }
     ];

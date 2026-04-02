@@ -254,7 +254,7 @@ export default function Auth() {
 
                     {/* Footer Links */}
                     <div style={{ marginTop: '2rem', textAlign: 'center', fontSize: '0.8rem', color: '#94a3b8' }}>
-                        © 2024 JanMitra. secure & encrypted.
+                        JanMitra – Your Digital Saathi for Government Services
                     </div>
                 </div>
             </div>
