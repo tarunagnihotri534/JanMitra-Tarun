@@ -1,7 +1,7 @@
 {
   "buildCommand": "cd JanMitra-master/frontend && npm install && npm run build",
   "outputDirectory": "JanMitra-master/frontend/dist",
-  "framework": "vite",
+  "framework": null,
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/server" },
     { "source": "/(.*)", "destination": "/index.html" }

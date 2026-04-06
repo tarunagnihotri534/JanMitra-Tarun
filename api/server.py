@@ -39,11 +39,13 @@ import json
 import os
 
 translation_cache = {}
+_cache_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'translation_cache.json')
 try:
-    with open('translation_cache.json', 'r', encoding='utf-8') as f:
+    with open(_cache_path, 'r', encoding='utf-8') as f:
         translation_cache = json.load(f)
 except Exception as e:
     print("Warning: Could not load translation_cache.json", e)
+
 
 def translate_text(text, target_lang):
     """Translate text using Google Translator with caching."""
@@ -1199,8 +1201,8 @@ Note: If the user just says hello or asks a general question, reply simply in th
             detail=str(e)
         )
 
-# Vercel Adapter: Mount the FastAPI app at /api to match Vercel rewriting
-original_app = app
-app = FastAPI()
-app.mount("/api", original_app)
+# Vercel serverless handler: export `app` directly.
+# Vercel rewrites /api/* -> /api/server, so the routes on `app` are served at /api/*.
+# Do NOT re-mount under /api or routes will become /api/api/*.
+handler = app
 
