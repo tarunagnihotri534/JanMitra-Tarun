@@ -195,7 +195,7 @@ export default function CompareSchemes() {
     // Fetch all schemes once (re-fetch on language change for translated content)
     useEffect(() => {
         const langParam = language ? language.toLowerCase() : 'en';
-        fetch(`http://127.0.0.1:8000/schemes?language=${langParam}`)
+        fetch(`/api/schemes?language=${langParam}`)
             .then(r => r.json())
             .then(data => setAllSchemes(data))
             .catch(console.error);
@@ -246,7 +246,7 @@ export default function CompareSchemes() {
         formData.append("file", file);
 
         try {
-            const res = await axios.post("http://127.0.0.1:8000/analyze-document", formData, {
+            const res = await axios.post("/api/analyze-document", formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 

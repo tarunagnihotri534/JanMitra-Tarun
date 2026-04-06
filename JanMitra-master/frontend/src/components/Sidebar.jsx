@@ -35,7 +35,7 @@ export default function Sidebar({ onSearch }) {
 
     const performSearch = async (currentFilters) => {
         try {
-            const response = await axios.get('http://127.0.0.1:8000/schemes', {
+            const response = await axios.get('/api/schemes', {
                 params: {
                     state: currentFilters.state === t.sidebar.allStates ? null : currentFilters.state,
                     gender: currentFilters.gender === t.sidebar.any ? null : currentFilters.gender,

@@ -17,7 +17,7 @@ export default function GrievanceForm() {
         if (!message.trim()) return;
         setLoading(true);
         try {
-            const res = await axios.post('http://127.0.0.1:8000/analyze-issue', {
+            const res = await axios.post('/api/analyze-issue', {
                 citizen_message: message
             });
             setResult(res.data);
@@ -31,7 +31,7 @@ export default function GrievanceForm() {
 
     const handleSubmit = async () => {
         try {
-            await axios.post('http://127.0.0.1:8000/submissions', {
+            await axios.post('/api/submissions', {
                 formType: "JanMitra AI Grievance",
                 formData: result
             });

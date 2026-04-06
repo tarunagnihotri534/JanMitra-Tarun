@@ -10,6 +10,16 @@ logger = logging.getLogger(__name__)
 DB_FILE = "janmitra.db"
 JSON_FILE = "submissions.json"
 
+import os, shutil
+if os.environ.get("VERCEL"):
+    DB_FILE = "/tmp/janmitra.db"
+    original_db = os.path.join(os.path.dirname(__file__), "janmitra.db")
+    if not os.path.exists(DB_FILE) and os.path.exists(original_db):
+        try:
+            shutil.copy2(original_db, DB_FILE)
+        except Exception:
+            pass
+
 def get_db_connection():
     conn = sqlite3.connect(DB_FILE)
     conn.row_factory = sqlite3.Row

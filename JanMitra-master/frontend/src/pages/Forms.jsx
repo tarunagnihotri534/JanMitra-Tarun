@@ -36,7 +36,7 @@ export default function Forms() {
     // Initial Data Fetch
     useEffect(() => {
         if (isScheme) {
-            axios.get(`http://127.0.0.1:8000/schemes/${type}`, {
+            axios.get(`/api/schemes/${type}`, {
                 params: { language }
             })
                 .then(res => {
@@ -209,7 +209,7 @@ export default function Forms() {
         e.preventDefault();
         setSubmitting(true);
         try {
-            const res = await axios.post('http://127.0.0.1:8000/submissions', {
+            const res = await axios.post('/api/submissions', {
                 formType: isScheme ? schemeData?.name : (t.forms.titles[type] || type),
                 formData
             });

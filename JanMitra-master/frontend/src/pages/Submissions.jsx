@@ -16,7 +16,7 @@ export default function Submissions() {
 
     const fetchSubmissions = async () => {
         try {
-            const response = await axios.get('http://127.0.0.1:8000/submissions');
+            const response = await axios.get('/api/submissions');
             // Sort by latest first
             const sorted = response.data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             setSubmissions(sorted);

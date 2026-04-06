@@ -70,7 +70,7 @@ export default function FormOptions() {
     React.useEffect(() => {
         const fetchSchemes = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:8000/schemes');
+                const response = await fetch('/api/schemes');
                 const data = await response.json();
                 // Map backend data to frontend card format
                 const mappedSchemes = data.map(s => ({

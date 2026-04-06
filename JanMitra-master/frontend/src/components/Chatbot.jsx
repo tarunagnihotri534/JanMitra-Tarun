@@ -79,7 +79,7 @@ const Chatbot = () => {
 
         // Send to backend
         try {
-            const res = await fetch('http://127.0.0.1:8000/chat', {
+            const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: userMsg, language: currLang })
@@ -107,7 +107,7 @@ const Chatbot = () => {
         setMessages(prev => [...prev, { type: 'user', text: text }]);
 
         try {
-            const res = await fetch('http://127.0.0.1:8000/chat', {
+            const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: text, language: currLang })

@@ -77,7 +77,7 @@ export default function VoiceAssistant() {
 
   const fetchSchemeDetails = async (id) => {
     try {
-      const res = await axios.get(`http://127.0.0.1:8000/schemes/${id}`);
+      const res = await axios.get(`/api/schemes/${id}`);
       if (!res.data.error) setGuideSteps(res.data.filling_steps || []);
     } catch (err) { console.error(err); }
   };

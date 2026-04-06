@@ -192,7 +192,7 @@ export default function Dashboard() {
             try {
                 // Ensure language is lowercase for backend compatibility
                 const langParam = language ? language.toLowerCase() : 'en';
-                const response = await fetch(`http://127.0.0.1:8000/schemes?language=${langParam}`);
+                const response = await fetch(`/api/schemes?language=${langParam}`);
                 const allSchemes = await response.json();
                 // Filter for youth-appropriate schemes
                 const youthSchemeIds = [3, 5, 6, 12, 17, 20, 21, 22, 23, 24, 25];

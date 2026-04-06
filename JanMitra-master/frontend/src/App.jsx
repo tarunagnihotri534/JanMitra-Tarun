@@ -79,7 +79,7 @@ function AppContent() {
 function App() {
   // Backend Health Check (Optional)
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/')
+    fetch('/api/')
       .then(res => res.ok && console.log("Backend Connected"))
       .catch(console.error);
   }, []);
