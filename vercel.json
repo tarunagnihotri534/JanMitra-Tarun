@@ -1,9 +1,20 @@
 {
-  "buildCommand": "cd JanMitra-master/frontend && npm install && npm run build",
-  "outputDirectory": "JanMitra-master/frontend/dist",
-  "framework": "vite",
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index" },
-    { "source": "/(.*)", "destination": "/index.html" }
+  "builds": [
+    {
+      "src": "JanMitra-master/frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    },
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index.py" },
+    { "src": "/(.*)", "dest": "/JanMitra-master/frontend/dist/$1" },
+    { "src": "/(.*)", "status": 404, "dest": "/JanMitra-master/frontend/dist/index.html" }
   ]
 }
