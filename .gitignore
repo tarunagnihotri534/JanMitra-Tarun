@@ -1,0 +1,19 @@
+# Virtual environments
+.venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+dist/
+
+# Database (local dev only, bundled in api/ for Vercel)
+/janmitra.db
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

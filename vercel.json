@@ -2,6 +2,11 @@
   "buildCommand": "cd JanMitra-master/frontend && npm install && npm run build",
   "outputDirectory": "JanMitra-master/frontend/dist",
   "framework": null,
+  "functions": {
+    "api/server.py": {
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/server" },
     { "source": "/(.*)", "destination": "/index.html" }

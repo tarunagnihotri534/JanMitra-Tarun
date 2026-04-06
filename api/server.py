@@ -1201,8 +1201,26 @@ Note: If the user just says hello or asks a general question, reply simply in th
             detail=str(e)
         )
 
-# Vercel serverless handler: export `app` directly.
-# Vercel rewrites /api/* -> /api/server, so the routes on `app` are served at /api/*.
-# Do NOT re-mount under /api or routes will become /api/api/*.
+# Vercel serverless handler
+# On Vercel, requests come in as /api/health, /api/schemes, etc.
+# but our FastAPI routes are defined as /health, /schemes, etc.
+# This ASGI wrapper strips the /api prefix so routes match correctly.
+if os.environ.get("VERCEL"):
+    from starlette.middleware.base import BaseHTTPMiddleware
+    from starlette.requests import Request as StarletteRequest
+
+    class StripAPIPrefixMiddleware(BaseHTTPMiddleware):
+        async def dispatch(self, request: StarletteRequest, call_next):
+            # Strip /api prefix from the path
+            if request.url.path.startswith("/api"):
+                scope = request.scope
+                original_path = scope["path"]
+                scope["path"] = original_path[4:] or "/"  # /api/health -> /health
+                if "raw_path" in scope:
+                    scope["raw_path"] = scope["path"].encode("utf-8")
+            return await call_next(request)
+
+    app.add_middleware(StripAPIPrefixMiddleware)
+
 handler = app
 
