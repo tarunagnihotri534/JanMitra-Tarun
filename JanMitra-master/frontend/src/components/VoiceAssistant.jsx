@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import { fetchSchemeById } from "../lib/api.js";
 import { Mic, X, Volume2, ChevronRight, ChevronLeft, Zap, Sparkles } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
@@ -77,8 +77,8 @@ export default function VoiceAssistant() {
 
   const fetchSchemeDetails = async (id) => {
     try {
-      const res = await axios.get(`/api/schemes/${id}`);
-      if (!res.data.error) setGuideSteps(res.data.filling_steps || []);
+      const data = await fetchSchemeById(id);
+      if (data) setGuideSteps(data.filling_steps || []);
     } catch (err) { console.error(err); }
   };
 

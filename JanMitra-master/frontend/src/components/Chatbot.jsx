@@ -77,22 +77,20 @@ const Chatbot = () => {
         setInputValue('');
         setMessages(prev => [...prev, { type: 'user', text: userMsg }]);
 
-        // Send to backend
+        // Try backend AI, fallback to local responses
         try {
-            const res = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: userMsg, language: currLang })
-            });
-            const data = await res.json();
-
-            if (res.ok && data.reply) {
-                setMessages(prev => [...prev, { type: 'bot', text: data.reply }]);
-            } else {
-                setMessages(prev => [...prev, { type: 'bot', text: "Sorry, I encountered an error answering your question. " + (data.detail || "") }]);
-            }
+            const { chat } = await import('../lib/api.js');
+            const data = await chat(userMsg, currLang);
+            setMessages(prev => [...prev, { type: 'bot', text: data.reply }]);
         } catch (error) {
-            setMessages(prev => [...prev, { type: 'bot', text: "Error connecting to AI Assistant." }]);
+            // Fallback: check for local keyword responses
+            const lower = userMsg.toLowerCase();
+            let reply = content.learning;
+            if (lower.includes('safe') || lower.includes('secure') || lower.includes('सुरक्षित')) reply = content.responses.safe;
+            else if (lower.includes('scheme') || lower.includes('योजना') || lower.includes('service')) reply = content.responses.scheme;
+            else if (lower.includes('date') || lower.includes('deadline') || lower.includes('तिथि')) reply = content.responses.dates;
+            else if (lower.includes('hello') || lower.includes('hi') || lower.includes('नमस्ते')) reply = content.responses.hello;
+            setMessages(prev => [...prev, { type: 'bot', text: reply }]);
         }
     };
 
@@ -107,20 +105,13 @@ const Chatbot = () => {
         setMessages(prev => [...prev, { type: 'user', text: text }]);
 
         try {
-            const res = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text, language: currLang })
-            });
-            const data = await res.json();
-
-            if (res.ok && data.reply) {
-                setMessages(prev => [...prev, { type: 'bot', text: data.reply }]);
-            } else {
-                setMessages(prev => [...prev, { type: 'bot', text: "Sorry, I encountered an error." }]);
-            }
+            const { chat } = await import('../lib/api.js');
+            const data = await chat(text, currLang);
+            setMessages(prev => [...prev, { type: 'bot', text: data.reply }]);
         } catch (error) {
-            setMessages(prev => [...prev, { type: 'bot', text: "Error connecting to AI Assistant." }]);
+            // Fallback to local predefined response
+            const reply = content.responses[key] || content.learning;
+            setMessages(prev => [...prev, { type: 'bot', text: reply }]);
         }
     };
 

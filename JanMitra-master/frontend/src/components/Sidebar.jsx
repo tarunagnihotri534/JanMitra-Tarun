@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { translations } from '../utils/translations';
 
-import axios from 'axios';
+import { fetchSchemes } from '../lib/api.js';
 
 import './Sidebar.css';
 
@@ -35,21 +35,18 @@ export default function Sidebar({ onSearch }) {
 
     const performSearch = async (currentFilters) => {
         try {
-            const response = await axios.get('/api/schemes', {
-                params: {
-                    state: currentFilters.state === t.sidebar.allStates ? null : currentFilters.state,
-                    gender: currentFilters.gender === t.sidebar.any ? null : currentFilters.gender,
-                    age: currentFilters.age === t.sidebar.any ? null : currentFilters.age,
-                    category: currentFilters.category === t.sidebar.any ? null : currentFilters.category,
-                    language: language
-                }
+            const data = await fetchSchemes({
+                state: currentFilters.state === t.sidebar.allStates ? null : currentFilters.state,
+                gender: currentFilters.gender === t.sidebar.any ? null : currentFilters.gender,
+                age: currentFilters.age === t.sidebar.any ? null : currentFilters.age,
+                category: currentFilters.category === t.sidebar.any ? null : currentFilters.category,
+                language: language
             });
             if (onSearch) {
-                onSearch(response.data);
+                onSearch(data);
             }
         } catch (error) {
             console.error("Error searching schemes:", error);
-            alert("Backend Error: Make sure the Python server is running on port 8000.");
         }
     };
 

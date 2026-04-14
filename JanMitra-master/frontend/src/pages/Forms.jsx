@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import GrievanceForm from './GrievanceForm';
 import { useLanguage } from '../context/LanguageContext';
-import axios from 'axios';
+import { fetchSchemeById, createSubmission } from '../lib/api.js';
 import { Check, ArrowLeft, Mic, Send, FileText, Info, Loader2, AlignLeft, CreditCard, Activity } from 'lucide-react';
 import SpeakerButton from '../components/SpeakerButton';
 import gsap from 'gsap';
@@ -36,14 +36,12 @@ export default function Forms() {
     // Initial Data Fetch
     useEffect(() => {
         if (isScheme) {
-            axios.get(`/api/schemes/${type}`, {
-                params: { language }
-            })
-                .then(res => {
-                    if (!res.data.error) {
-                        setSchemeData(res.data);
+            fetchSchemeById(type, language)
+                .then(data => {
+                    if (data && !data.error) {
+                        setSchemeData(data);
                         const dynamicFields = {};
-                        res.data.required_docs?.forEach(doc => {
+                        data.required_docs?.forEach(doc => {
                             if (doc.toLowerCase() !== 'aadhar card') dynamicFields[doc] = '';
                         });
                         setFormData(prev => ({ ...prev, ...dynamicFields }));
@@ -209,12 +207,11 @@ export default function Forms() {
         e.preventDefault();
         setSubmitting(true);
         try {
-            const res = await axios.post('/api/submissions', {
-                formType: isScheme ? schemeData?.name : (t.forms.titles[type] || type),
+            const res = await createSubmission(
+                isScheme ? schemeData?.name : (t.forms.titles[type] || type),
                 formData
-            });
-            if (res.data.success) {
-                // Success Animation
+            );
+            if (res.success) {
                 navigate('/submissions');
             }
         } catch (error) {

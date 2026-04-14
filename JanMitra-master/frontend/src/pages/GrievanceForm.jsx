@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { analyzeIssue, createSubmission } from '../lib/api.js';
 import { motion } from 'framer-motion';
 import { Send, AlertTriangle, MapPin, Building2, ShieldAlert, Loader2, ArrowLeft, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -17,13 +17,11 @@ export default function GrievanceForm() {
         if (!message.trim()) return;
         setLoading(true);
         try {
-            const res = await axios.post('/api/analyze-issue', {
-                citizen_message: message
-            });
-            setResult(res.data);
+            const data = await analyzeIssue(message);
+            setResult(data);
         } catch (error) {
             console.error(error);
-            alert(t.grievanceForm?.analysisFailed || "Analysis failed. Please ensure the backend is running.");
+            alert(t.grievanceForm?.analysisFailed || "AI analysis requires the backend server. Please try on the deployed version.");
         } finally {
             setLoading(false);
         }
@@ -31,10 +29,7 @@ export default function GrievanceForm() {
 
     const handleSubmit = async () => {
         try {
-            await axios.post('/api/submissions', {
-                formType: "JanMitra AI Grievance",
-                formData: result
-            });
+            await createSubmission("JanMitra AI Grievance", result);
             navigate('/submissions');
         } catch (error) {
             console.error(error);

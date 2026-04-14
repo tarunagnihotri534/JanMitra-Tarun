@@ -22,21 +22,12 @@ export default function FormReader() {
         setLoading(true);
         setError('');
 
-        const formData = new FormData();
-        formData.append('file', file);
-
         try {
-            const response = await fetch('/api/analyze-form-risk', {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (!response.ok) throw new Error('Failed to analyze document.');
-            
-            const data = await response.json();
+            const { analyzeFormRisk } = await import('../lib/api.js');
+            const data = await analyzeFormRisk(file);
             setAnalysis(data);
         } catch (err) {
-            setError(err.message || "An error occurred during analysis.");
+            setError("AI analysis requires the backend server. This feature works on the deployed version.");
         } finally {
             setLoading(false);
         }

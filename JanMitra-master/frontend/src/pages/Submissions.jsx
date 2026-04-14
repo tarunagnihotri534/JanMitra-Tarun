@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
+import { fetchSubmissions as loadSubmissions } from '../lib/api.js';
 import { Download, Trash2, Eye, FileText, Calendar, Clock, CheckCircle, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -11,14 +11,13 @@ export default function Submissions() {
     const [expandedId, setExpandedId] = useState(null);
 
     useEffect(() => {
-        fetchSubmissions();
+        fetchAllSubmissions();
     }, []);
 
-    const fetchSubmissions = async () => {
+    const fetchAllSubmissions = async () => {
         try {
-            const response = await axios.get('/api/submissions');
-            // Sort by latest first
-            const sorted = response.data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            const data = await loadSubmissions();
+            const sorted = data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             setSubmissions(sorted);
         } catch (error) {
             console.error("Error fetching submissions:", error);

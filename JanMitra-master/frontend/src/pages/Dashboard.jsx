@@ -192,8 +192,8 @@ export default function Dashboard() {
             try {
                 // Ensure language is lowercase for backend compatibility
                 const langParam = language ? language.toLowerCase() : 'en';
-                const response = await fetch(`/api/schemes?language=${langParam}`);
-                const allSchemes = await response.json();
+                const { fetchSchemes } = await import('../lib/api.js');
+                const allSchemes = await fetchSchemes({ language: langParam });
                 // Filter for youth-appropriate schemes
                 const youthSchemeIds = [3, 5, 6, 12, 17, 20, 21, 22, 23, 24, 25];
                 // Ensure ID is treated as number for comparison

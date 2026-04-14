@@ -7,8 +7,12 @@ __pycache__/
 node_modules/
 dist/
 
-# Database (local dev only, bundled in api/ for Vercel)
+# Database (no longer needed with Supabase)
 /janmitra.db
+*.db
+
+# Environment variables (NEVER commit secrets)
+.env
 
 # IDE
 .vscode/

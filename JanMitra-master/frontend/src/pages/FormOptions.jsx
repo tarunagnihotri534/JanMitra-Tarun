@@ -68,15 +68,14 @@ export default function FormOptions() {
     const [schemes, setSchemes] = React.useState([]);
 
     React.useEffect(() => {
-        const fetchSchemes = async () => {
+        const loadSchemes = async () => {
             try {
-                const response = await fetch('/api/schemes');
-                const data = await response.json();
-                // Map backend data to frontend card format
+                const { fetchSchemes } = await import('../lib/api.js');
+                const data = await fetchSchemes();
                 const mappedSchemes = data.map(s => ({
-                    id: s.id, // Keep integer ID for linking
+                    id: s.id,
                     name: s.name,
-                    icon: Sprout, // Default icon, can be dynamic based on category
+                    icon: Sprout,
                     color: '#10b981',
                     category: 'schemes',
                     description: s.description
@@ -86,7 +85,7 @@ export default function FormOptions() {
                 console.error("Failed to fetch schemes:", error);
             }
         };
-        fetchSchemes();
+        loadSchemes();
     }, []);
 
     const allForms = [...schemes, ...govForms];

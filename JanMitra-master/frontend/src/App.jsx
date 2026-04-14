@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 
@@ -77,13 +77,6 @@ function AppContent() {
 }
 
 function App() {
-  // Backend Health Check (Optional)
-  useEffect(() => {
-    fetch('/api/')
-      .then(res => res.ok && console.log("Backend Connected"))
-      .catch(console.error);
-  }, []);
-
   return (
     <ErrorBoundary>
       <AuthProvider>

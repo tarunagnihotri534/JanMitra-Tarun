@@ -6,7 +6,7 @@ import {
     Landmark, ShieldCheck, Sprout, Users, Activity, FileText, Upload
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { fetchSchemes, analyzeDocument } from '../lib/api.js';
 import { useLanguage } from '../context/LanguageContext';
 import './CompareSchemes.css';
 
@@ -195,8 +195,7 @@ export default function CompareSchemes() {
     // Fetch all schemes once (re-fetch on language change for translated content)
     useEffect(() => {
         const langParam = language ? language.toLowerCase() : 'en';
-        fetch(`/api/schemes?language=${langParam}`)
-            .then(r => r.json())
+        fetchSchemes({ language: langParam })
             .then(data => setAllSchemes(data))
             .catch(console.error);
     }, [language]);
@@ -246,12 +245,7 @@ export default function CompareSchemes() {
         formData.append("file", file);
 
         try {
-            const res = await axios.post("/api/analyze-document", formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
-
-            // Map AI inferences to state
-            const data = res.data;
+            const data = await analyzeDocument(file);
             if (data.age_group) setSelectedAge(data.age_group);
             if (data.state) setSelectedState(INDIAN_STATES.find(s => s.toLowerCase() === data.state.toLowerCase()) || '');
             
