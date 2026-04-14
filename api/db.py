@@ -3,7 +3,7 @@ import logging
 import threading
 import os
 from datetime import datetime, timedelta
-from supabase import create_client, Client
+import httpx
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -15,7 +15,36 @@ SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 if not SUPABASE_URL or not SUPABASE_KEY:
     raise RuntimeError("SUPABASE_URL and SUPABASE_KEY environment variables are required")
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+HEADERS = {
+    "apikey": SUPABASE_KEY,
+    "Authorization": f"Bearer {SUPABASE_KEY}",
+    "Content-Type": "application/json",
+    "Prefer": "return=representation",
+}
+
+REST_URL = f"{SUPABASE_URL}/rest/v1"
+
+
+def _get(table, params=""):
+    url = f"{REST_URL}/{table}?{params}" if params else f"{REST_URL}/{table}?select=*"
+    r = httpx.get(url, headers=HEADERS, timeout=15)
+    r.raise_for_status()
+    return r.json()
+
+
+def _post(table, data):
+    url = f"{REST_URL}/{table}"
+    r = httpx.post(url, headers=HEADERS, json=data, timeout=15)
+    r.raise_for_status()
+    return r.json()
+
+
+def _upsert(table, data):
+    url = f"{REST_URL}/{table}"
+    h = {**HEADERS, "Prefer": "return=representation,resolution=merge-duplicates"}
+    r = httpx.post(url, headers=h, json=data, timeout=30)
+    r.raise_for_status()
+    return r.json()
 
 
 def init_db(initial_schemes=None):
@@ -26,8 +55,8 @@ def init_db(initial_schemes=None):
 
 def _ensure_hindi_table(schemes_data):
     try:
-        result = supabase.table("schemes_hi").select("id", count="exact").limit(1).execute()
-        count = result.count or 0
+        rows = _get("schemes_hi", "select=id&limit=1")
+        count = len(rows)
     except Exception:
         count = 0
     if count == 0 and schemes_data:
@@ -35,7 +64,7 @@ def _ensure_hindi_table(schemes_data):
         thread = threading.Thread(target=_build_hindi_table, args=(schemes_data,), daemon=True)
         thread.start()
     else:
-        print(f"[JanMitra] Hindi table ready ({count} schemes).")
+        print(f"[JanMitra] Hindi table ready.")
 
 
 def _build_hindi_table(schemes_data):
@@ -88,7 +117,7 @@ def _build_hindi_table(schemes_data):
 
         translated.sort(key=lambda x: x["id"])
         if translated:
-            supabase.table("schemes_hi").upsert(translated).execute()
+            _upsert("schemes_hi", translated)
         print(f"[JanMitra] Hindi table built with {len(translated)} schemes!")
     except Exception as e:
         print(f"[JanMitra] Hindi table build failed: {e}")
@@ -110,7 +139,7 @@ def seed_schemes(schemes_data):
             "last_date": s.get("last_date", "31 December 2026"),
             "updated_at": datetime.utcnow().isoformat(),
         })
-    supabase.table("schemes").upsert(rows).execute()
+    _upsert("schemes", rows)
     print("Schemes update completed.")
 
 
@@ -133,9 +162,9 @@ def _to_scheme_dict(row, include_timestamps=True):
 
 
 def get_all_schemes(state=None, gender=None, age=None, category=None, updated_only=False):
-    result = supabase.table("schemes").select("*").execute()
+    rows = _get("schemes", "select=*")
     schemes = []
-    for row in result.data:
+    for row in rows:
         if state and state not in ["All States", "\u0938\u092d\u0940 \u0930\u093e\u091c\u094d\u092f", "Any"]:
             if row.get("state") not in [state, "Any", "All States"]:
                 continue
@@ -157,22 +186,23 @@ def get_all_schemes(state=None, gender=None, age=None, category=None, updated_on
 
 
 def get_all_schemes_hi(en_ids):
-    result = supabase.table("schemes_hi").select("*").in_("id", en_ids).execute()
-    id_map = {r["id"]: _to_scheme_dict(r, include_timestamps=False) for r in result.data}
+    ids_str = ",".join(str(i) for i in en_ids)
+    rows = _get("schemes_hi", f"select=*&id=in.({ids_str})")
+    id_map = {r["id"]: _to_scheme_dict(r, include_timestamps=False) for r in rows}
     return [id_map[i] for i in en_ids if i in id_map]
 
 
 def get_scheme_by_id_hi(scheme_id):
-    result = supabase.table("schemes_hi").select("*").eq("id", scheme_id).execute()
-    if result.data:
-        return _to_scheme_dict(result.data[0], include_timestamps=False)
+    rows = _get("schemes_hi", f"select=*&id=eq.{scheme_id}")
+    if rows:
+        return _to_scheme_dict(rows[0], include_timestamps=False)
     return None
 
 
 def get_scheme_by_id(scheme_id):
-    result = supabase.table("schemes").select("*").eq("id", scheme_id).execute()
-    if result.data:
-        return _to_scheme_dict(result.data[0])
+    rows = _get("schemes", f"select=*&id=eq.{scheme_id}")
+    if rows:
+        return _to_scheme_dict(rows[0])
     return None
 
 
@@ -182,13 +212,13 @@ def migrate_from_json():
 
 def create_submission(form_type, form_data):
     timestamp = datetime.utcnow().isoformat()
-    result = supabase.table("submissions").insert({
+    result = _post("submissions", {
         "form_type": form_type, "form_data": form_data, "timestamp": timestamp,
-    }).execute()
-    new_row = result.data[0]
+    })
+    new_row = result[0]
     return {"id": new_row["id"], "formType": form_type, "formData": form_data, "timestamp": timestamp}
 
 
 def get_all_submissions():
-    result = supabase.table("submissions").select("*").order("id", desc=True).execute()
-    return [{"id": r["id"], "formType": r["form_type"], "formData": r.get("form_data", {}), "timestamp": r["timestamp"]} for r in result.data]
+    rows = _get("submissions", "select=*&order=id.desc")
+    return [{"id": r["id"], "formType": r["form_type"], "formData": r.get("form_data", {}), "timestamp": r["timestamp"]} for r in rows]
